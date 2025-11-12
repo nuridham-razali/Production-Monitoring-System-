@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Planning - Halagel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #059669;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .nav a {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .form-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .form-card h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .process-section {
+            background: var(--gray-100);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .process-section h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn:disabled {
+            background: var(--gray-600);
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 500;
+            display: none;
+            border-left: 4px solid;
+        }
+        
+        .message.success {
+            background: #f0fdf4;
+            color: #166534;
+            border-left-color: #22c55e;
+            display: block;
+        }
+        
+        .message.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left-color: #ef4444;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="index.html">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </a>
+            <a href="plan-entry.html" class="active">
+                <i class="fas fa-calendar-plus"></i>
+                Production Planning
+            </a>
+            <a href="actual-entry.html">
+                <i class="fas fa-clipboard-check"></i>
+                Actual Production
+            </a>
+        </div>
+        
+        <div class="form-card">
+            <h2><i class="fas fa-calendar-plus"></i> Production Planning Form</h2>
+            <form id="planForm">
+                <div class="form-group">
+                    <label for="planType">Production Type *</label>
+                    <select id="planType" required>
+                        <option value="">Select Production Type</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="toothpaste">Toothpaste</option>
+                        <option value="rocksalt">Rocksalt</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="month">Month *</label>
+                    <input type="month" id="month" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weekStartDate">Week Start Date (Sunday) *</label>
+                    <input type="date" id="weekStartDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="day">Day *</label>
+                    <select id="day" required>
+                        <option value="">Select Day</option>
+                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <!-- Friday and Saturday are OFF days -->
+                    </select>
+                </div>
+                
+                <div class="process-section">
+                    <h3><i class="fas fa-blender"></i> Premixing</h3>
+                    <div class="form-group">
+                        <label for="premixProduct">Product Name</label>
+                        <input type="text" id="premixProduct" placeholder="e.g., Vitamin C, Herbal Fresh">
+                    </div>
+                    <div class="form-group">
+                        <label for="premixPlanned">Planned Quantity (Units)</label>
+                        <input type="number" id="premixPlanned" placeholder="0" min="0">
+                    </div>
+                </div>
+                
+                <div class="process-section">
+                    <h3><i class="fas fa-cogs"></i> Process</h3>
+                    <div class="form-group">
+                        <label for="processProduct">Product Name</label>
+                        <input type="text" id="processProduct" placeholder="e.g., Vitamin Capsules, Herbal Blast">
+                    </div>
+                    <div class="form-group">
+                        <label for="processPlanned">Planned Quantity (Units)</label>
+                        <input type="number" id="processPlanned" placeholder="0" min="0">
+                    </div>
+                </div>
+                
+                <div class="process-section" id="sortingSection">
+                    <h3><i class="fas fa-filter"></i> Sorting</h3>
+                    <div class="form-group">
+                        <label for="sortProduct">Product Name</label>
+                        <input type="text" id="sortProduct" placeholder="e.g., Vitamin C 60ct">
+                    </div>
+                    <div class="form-group">
+                        <label for="sortPlanned">Planned Quantity (Units)</label>
+                        <input type="number" id="sortPlanned" placeholder="0" min="0">
+                    </div>
+                </div>
+                
+                <div class="process-section">
+                    <h3><i class="fas fa-box"></i> Packing</h3>
+                    <div class="form-group">
+                        <label for="packProduct">Product Name</label>
+                        <input type="text" id="packProduct" placeholder="e.g., Vitamin C 60ct, Herbal Blast 100ml">
+                    </div>
+                    <div class="form-group">
+                        <label for="packPlanned">Planned Quantity (Units)</label>
+                        <input type="number" id="packPlanned" placeholder="0" min="0">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i>
+                    Save Production Plan
+                </button>
+            </form>
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzHn9v9ggm_i7yrKahCHyQHc2w2j16Nk3fca45aKuYo8UjlnEdJ83tVr2NB6TEJ0qPJ/exec';
+        
+        // Hide sorting section for toothpaste
+        document.getElementById('planType').addEventListener('change', function() {
+            const sortingSection = document.getElementById('sortingSection');
+            if (this.value === 'toothpaste') {
+                sortingSection.style.display = 'none';
+            } else {
+                sortingSection.style.display = 'block';
+            }
+        });
+        
+        document.getElementById('planForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            const formData = {
+                planType: document.getElementById('planType').value,
+                month: document.getElementById('month').value,
+                weekStartDate: document.getElementById('weekStartDate').value,
+                day: document.getElementById('day').value,
+                premixProduct: document.getElementById('premixProduct').value,
+                premixPlanned: document.getElementById('premixPlanned').value,
+                processProduct: document.getElementById('processProduct').value,
+                processPlanned: document.getElementById('processPlanned').value,
+                sortProduct: document.getElementById('sortProduct').value,
+                sortPlanned: document.getElementById('sortPlanned').value,
+                packProduct: document.getElementById('packProduct').value,
+                packPlanned: document.getElementById('packPlanned').value
+            };
+            
+            fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}`;
+                document.getElementById('message').className = 'message success';
+                document.getElementById('planForm').reset();
+            })
+            .catch(error => {
+                document.getElementById('message').innerHTML = `<i class="fas fa-exclamation-circle"></i> Error saving data: ${error.message}`;
+                document.getElementById('message').className = 'message error';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Production Plan';
+            });
+        });
+
+        // Set default date to today
+        document.getElementById('weekStartDate').valueAsDate = new Date();
+        
+        // Set default month to current month
+        const now = new Date();
+        document.getElementById('month').value = now.toISOString().substring(0, 7);
+    </script>
+</body>
+</html>
