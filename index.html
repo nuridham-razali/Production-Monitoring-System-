@@ -19,6 +19,8 @@
             --light: #f8fafc;
             --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
             --gray-600: #4b5563;
             --gray-800: #1f2937;
         }
@@ -34,11 +36,14 @@
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
             color: var(--dark);
+            overflow-x: hidden;
         }
         
         .dashboard-container {
             min-height: 100vh;
             padding: 1rem;
+            width: 100%;
+            overflow-x: hidden;
         }
         
         /* Header Styles */
@@ -64,15 +69,17 @@
         }
         
         .logo {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 60px;
+            height: 60px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         .company-info h1 {
@@ -217,72 +224,173 @@
             margin-top: 0.5rem;
         }
         
-        /* Tab Navigation */
-        .tab-navigation {
-            display: flex;
+        /* Section Title */
+        .section-title {
             background: white;
             border-radius: 10px;
-            padding: 0.5rem;
-            margin-bottom: 1.5rem;
-            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--gray-200);
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: var(--gray-600);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
         
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
+        .section-title i {
+            color: var(--primary);
+            font-size: 1.5rem;
         }
         
-        /* Table Styles */
-        .table-container {
+        .section-title h2 {
+            color: var(--gray-800);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        /* Table Container with Horizontal Scroll */
+        .table-scroll-container {
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--gray-200);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--gray-200);
             margin-bottom: 1.5rem;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll-container::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .table-scroll-container::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+
+        .table-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--gray-400);
+            border-radius: 5px;
+        }
+
+        .table-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-600);
         }
         
         .data-table {
             width: 100%;
             border-collapse: collapse;
             background: white;
+            min-width: 1400px;
         }
         
-        .data-table th {
-            background: var(--primary);
+        /* Enhanced Table Headers */
+        .data-table thead tr:first-child th {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: white;
             padding: 1rem;
-            text-align: left;
+            text-align: center;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
-        .data-table td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--gray-200);
+        .data-table thead tr:nth-child(2) th {
+            background: var(--primary);
+            color: white;
+            padding: 0.875rem 1rem;
+            text-align: center;
+            font-weight: 500;
             font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+            position: sticky;
+            top: 56px;
+            z-index: 9;
         }
         
-        .data-table tr:hover {
+        /* Column Group Styling */
+        .column-group {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        }
+        
+        /* Table Body */
+        .data-table tbody td {
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--gray-300);
+            font-size: 0.85rem;
+            text-align: center;
+            white-space: nowrap;
+            background: white;
+        }
+        
+        .data-table tbody tr:nth-child(even) {
             background: var(--gray-100);
+        }
+        
+        .data-table tbody tr:nth-child(even) td {
+            background: var(--gray-100);
+        }
+        
+        .data-table tbody tr:hover td {
+            background: #e0f2fe;
+        }
+
+        /* Fixed first three columns */
+        .data-table th:nth-child(1),
+        .data-table th:nth-child(2),
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(1),
+        .data-table td:nth-child(2),
+        .data-table td:nth-child(3) {
+            position: sticky;
+            z-index: 8;
+            background: white;
+        }
+
+        .data-table th:nth-child(1) { left: 0; }
+        .data-table th:nth-child(2) { left: 80px; }
+        .data-table th:nth-child(3) { left: 140px; }
+        
+        .data-table td:nth-child(1) { 
+            left: 0;
+            font-weight: 600;
+            background: var(--gray-100);
+            border-right: 2px solid var(--gray-400);
+        }
+        .data-table td:nth-child(2) { 
+            left: 80px;
+            font-weight: 600;
+            background: var(--gray-100);
+        }
+        .data-table td:nth-child(3) { 
+            left: 140px;
+            font-weight: 600;
+            background: var(--gray-100);
+            border-right: 2px solid var(--gray-400);
+        }
+
+        .data-table tbody tr:nth-child(even) td:nth-child(1),
+        .data-table tbody tr:nth-child(even) td:nth-child(2),
+        .data-table tbody tr:nth-child(even) td:nth-child(3) {
+            background: #e0e7ff;
+        }
+
+        .data-table tbody tr:hover td:nth-child(1),
+        .data-table tbody tr:hover td:nth-child(2),
+        .data-table tbody tr:hover td:nth-child(3) {
+            background: #bfdbfe;
         }
         
         /* Empty State */
@@ -359,18 +467,36 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .tab-navigation {
-                flex-direction: column;
+
+            .data-table {
+                min-width: 1600px;
             }
-            
-            .table-container {
-                overflow-x: auto;
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-header {
+                padding: 1rem;
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .prod-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
             }
         }
         
-        .text-green { color: var(--success); }
-        .text-red { color: var(--danger); }
+        .text-green { color: var(--success); font-weight: 600; }
+        .text-red { color: var(--danger); font-weight: 600; }
         .text-center { text-align: center; }
         .font-semibold { font-weight: 600; }
         .hidden { display: none; }
@@ -381,15 +507,12 @@
         <!-- Header -->
         <header class="dashboard-header">
             <div class="header-content">
-            </div>
-             <div class="company-info">
-                    <div class="max-w-6xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-3 rounded-xl shadow-lg">
-                        <img id="companyLogo" src="data:image/png;base64,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">
-                    <div> 
-                   </div>
+                <div class="logo-section">
+                    <div class="logo">
+                        <!-- Replace this base64 string with your actual logo -->
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFJklEQVR4nO2bW2wUVRjHf7O7W9pudyutpbS0XEQLCBQQRUQUFTVGjYmJD8YHH3zwwQcffPPBBx998cEHE2N8MBpjjDEmxhgTY4wxatRoNBpFEVFAQLlIS+8t7XZ3Z8bZ0nS7O7uzO7sz287+k5M0mTnn+35nzsx3vuOxB6W+vh6VSF1dHQA1NTU4jU8DWgDrgR2AhkSuAlSj0aj6Y2BgQISCgQG/PzAwIEJhIKe+vr4mcNyBnoGBAX8wGPTLhMFg0B8MBv3BYNCfW1/+fQc6YiQFOBmh/f39/hEjRvh7e3tFKPT29vo6Ojr8HR0d/s7OTr/L5fJnP98BOmImOwkJCdi2TU9PT+h6V1cX09PTzMzMhD03Ozvr7O7udnd3d6s9e/ZoK4VXC4wKt9tNXV2dk3RDfX19Qq//79wIfBz0lKCrq8vX3d1NMBgk1hgYGLB1dXX5urq6fD6fz9fd3e3r6uryRX1PSkpqBE4G3Z6ent7U3t4u+vv7BYAQQvjPB90XXNzjca8E0OXH/f39FhE2f//9d0RPT4+lra2N1tZW6SYlJb0AfK4ALwDHh1Z+X19fOnCksrLSCyRv2LBBg7jvH1pbW9WOjg5VCBHEGhoaJL6+vh6AqamptMbGxvgpoLy8vA54Obi4HTg0u9FcRkZGxrlz525b+Fvh8XhE8LkZ3t7eXhZ+f/78+VVAdfD5QuAjIGX2M0tKSv4mAampqXcB5cG5U2NjYxlwIhDQ1q1bF3r29OnTSxJ+4cIFbfZze/fuvQa8DaQE69YC3wNZs+97WwrQNO0NIC08xsJsH/AXsGNW3VagPLg9PoqS9PR0B7DVdYcA03XXy4GRBXVFo1nNXhCH+vr6dsBluucB0M1muZ4YqOu1RcLX19cXaRyugB2ua++UlJSoMzMzGIDL5bqu63rE+x36HRDBv56SktKqadpW4Jquu1YJyICE2TdSNm/e/D+iFODz+ZLQdy8hhKCnp+d/7wghgoG1lStXtoBeVdPdQOe4cV/K8vLyOj09PcUZy7GzNnhMR3+AV3RdvwMIAJ+hH1ndiNvttgPfAgGlvLxc13X9UY/Hc3m2cOBIZmbme8BbwGPA8zMzM6VLS0tvFP5vIBP4OPgbPhkNl8vlB94D/lDKysp0Xde3A+Vmfqe1tbUEPQqMKQUFBZe9Xu8OYBdwH3ACeNzhcKwDHgG+Qj8p+gAO4C3gL6W4uFj4fL5yYL9Zn+fhw4dPA+UlJSV/ejyeW4Dc4Pd+C2QD+0z+6WVu3759fwAPlpSU9M9efyMCtpndE36dAnx+dV2/W6+4uNgHPA18Z9Zn+tDR0SEP+HtkZKQauA8YB/L1ioqKbYqm60eAy2Z9ljtBg+g7NwD4fL5bPXv27A+1paWl0zqdwTzfX8CQQbvZLiAAPA+YHqsFg4ODL5pWQDAP7qisrPwTuB+4AKy/1bd1f3//+7qudwKlwHBubu5UZWXl26BfPXPmjKl+INJaQIqiXEH/LV1tbGw8DaymCPjMrN+sq6uLA+GhlwE2my3GV0ATwPPokR/l5eVjoaEshHglLy/P1FFFQUHBfPt+IfAVeoS3FhQUhF5jmY3i4uJ3wOSnxAIYQ8/9lwFDZ8+evXGSaqqPMvRQfyb8TJCXl2cH/kjGfkBwcHCwGP2k59WZmZmS8DBwPTw8vAT9D4yvFk34YqCqrKzsNAzl+FZWVgaAz4yfn/7/YdGFLxs3blzbQnjvLqeQqBRF0YB3F8tlcn0vIESShZeRCf8H0dWVFCYXJ9kAAAAASUVORK5CYII=" alt="Halagel Logo">
+                    </div>
+                    <div class="company-info">
                         <h1>Halagel Manufacturing</h1>
                         <p>Production Monitoring System</p>
                     </div>
@@ -468,48 +591,14 @@
             </div>
         </div>
 
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="showTab('schedule')">
-                <i class="fas fa-calendar-week"></i>
-                Weekly Schedule
-            </button>
-            <button class="tab-btn" onclick="showTab('daily')">
-                <i class="fas fa-clipboard-list"></i>
-                Daily Operations
-            </button>
-        </div>
-
-        <!-- Weekly Schedule View -->
-        <div id="scheduleView" class="table-container">
-            <div class="empty-state" id="scheduleEmptyState">
-                <i class="fas fa-calendar-plus"></i>
-                <h3>No Schedule Data Available</h3>
-                <p>Create production plans to see weekly schedules</p>
-            </div>
-            <div class="hidden" id="scheduleTableContainer">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ACTIVITY</th>
-                            <th>SHIFT</th>
-                            <th>SUNDAY</th>
-                            <th>MONDAY</th>
-                            <th>TUESDAY</th>
-                            <th>WEDNESDAY</th>
-                            <th>THURSDAY</th>
-                            <th>FRIDAY</th>
-                            <th>SATURDAY</th>
-                            <th>WEEKLY TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scheduleTableBody"></tbody>
-                </table>
-            </div>
+        <!-- Section Title -->
+        <div class="section-title">
+            <i class="fas fa-clipboard-list"></i>
+            <h2>Daily Production Operations</h2>
         </div>
 
         <!-- Daily Operations View -->
-        <div id="dailyView" class="table-container hidden">
+        <div id="dailyView" class="table-scroll-container">
             <div class="empty-state" id="dailyEmptyState">
                 <i class="fas fa-clipboard-list"></i>
                 <h3>No Production Data Available</h3>
@@ -519,27 +608,40 @@
                 <table class="data-table" id="dailyTable">
                     <thead>
                         <tr>
-                            <th>MONTH</th>
-                            <th>DATE</th>
-                            <th>DAY</th>
-                            <th colspan="5">PREMIXING</th>
-                            <th colspan="5" id="processHeader">PROCESS</th>
-                            <th colspan="5" id="sortingHeader">SORTING</th>
-                            <th colspan="5">PACKING</th>
-                            <th>DAILY TOTAL</th>
+                            <th rowspan="2">MONTH</th>
+                            <th rowspan="2">DATE</th>
+                            <th rowspan="2">DAY</th>
+                            <th colspan="5" class="column-group">PREMIXING</th>
+                            <th colspan="5" class="column-group" id="processHeader">PROCESS</th>
+                            <th colspan="5" class="column-group" id="sortingHeader">SORTING</th>
+                            <th colspan="5" class="column-group">PACKING</th>
+                            <th rowspan="2">DAILY TOTAL</th>
                         </tr>
                         <tr>
-                            <th></th><th></th><th></th>
                             <!-- Premixing -->
-                            <th>Planned Product</th><th>Planned Qty</th><th>Actual Product</th><th>Batch</th><th>Actual Qty</th>
+                            <th>Planned Product</th>
+                            <th>Planned Qty</th>
+                            <th>Actual Product</th>
+                            <th>Batch</th>
+                            <th>Actual Qty</th>
                             <!-- Process/Filling -->
-                            <th>Planned Product</th><th>Planned Qty</th><th>Actual Product</th><th>Batch</th><th>Actual Qty</th>
+                            <th>Planned Product</th>
+                            <th>Planned Qty</th>
+                            <th>Actual Product</th>
+                            <th>Batch</th>
+                            <th>Actual Qty</th>
                             <!-- Sorting -->
-                            <th>Planned Product</th><th>Planned Qty</th><th>Actual Product</th><th>Batch</th><th>Actual Qty</th>
+                            <th>Planned Product</th>
+                            <th>Planned Qty</th>
+                            <th>Actual Product</th>
+                            <th>Batch</th>
+                            <th>Actual Qty</th>
                             <!-- Packing -->
-                            <th>Planned Product</th><th>Planned Qty</th><th>Actual Product</th><th>Batch</th><th>Actual Qty</th>
-                            <!-- Daily Total -->
-                            <th>Total Units</th>
+                            <th>Planned Product</th>
+                            <th>Planned Qty</th>
+                            <th>Actual Product</th>
+                            <th>Batch</th>
+                            <th>Actual Qty</th>
                         </tr>
                     </thead>
                     <tbody id="dailyTableBody"></tbody>
@@ -567,26 +669,20 @@
             if (type === 'toothpaste') {
                 processHeader.textContent = 'FILLING';
                 sortingHeader.style.display = 'none';
-                // Hide sorting columns for toothpaste
-                document.querySelectorAll('#dailyTable th:nth-child(13), #dailyTable th:nth-child(14), #dailyTable th:nth-child(15), #dailyTable th:nth-child(16), #dailyTable th:nth-child(17)').forEach(th => th.style.display = 'none');
-                document.querySelectorAll('#dailyTable td:nth-child(13), #dailyTable td:nth-child(14), #dailyTable td:nth-child(15), #dailyTable td:nth-child(16), #dailyTable td:nth-child(17)').forEach(td => td.style.display = 'none');
+                
+                // Hide sorting columns in both header and body
+                document.querySelectorAll('#dailyTable thead th:nth-child(n+13):nth-child(-n+17)').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('#dailyTable tbody td:nth-child(n+13):nth-child(-n+17)').forEach(el => el.style.display = 'none');
             } else {
                 processHeader.textContent = 'PROCESS';
                 sortingHeader.style.display = '';
-                // Show sorting columns for other types
-                document.querySelectorAll('#dailyTable th:nth-child(13), #dailyTable th:nth-child(14), #dailyTable th:nth-child(15), #dailyTable th:nth-child(16), #dailyTable th:nth-child(17)').forEach(th => th.style.display = '');
-                document.querySelectorAll('#dailyTable td:nth-child(13), #dailyTable td:nth-child(14), #dailyTable td:nth-child(15), #dailyTable td:nth-child(16), #dailyTable td:nth-child(17)').forEach(td => td.style.display = '');
+                
+                // Show sorting columns
+                document.querySelectorAll('#dailyTable thead th:nth-child(n+13):nth-child(-n+17)').forEach(el => el.style.display = '');
+                document.querySelectorAll('#dailyTable tbody td:nth-child(n+13):nth-child(-n+17)').forEach(el => el.style.display = '');
             }
             
             loadData();
-        }
-
-        function showTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            
-            document.getElementById('scheduleView').classList.toggle('hidden', tab !== 'schedule');
-            document.getElementById('dailyView').classList.toggle('hidden', tab !== 'daily');
         }
 
         function loadData() {
@@ -617,16 +713,7 @@
             document.getElementById('totalManpower').textContent = data.stats.totalManpower.toLocaleString();
             document.getElementById('manpowerDate').textContent = 'Last updated: ' + (data.manpower.date || 'No data');
             
-            // Render tables or show empty state
-            if (data.weekly && data.weekly.length > 0) {
-                document.getElementById('scheduleEmptyState').classList.add('hidden');
-                document.getElementById('scheduleTableContainer').classList.remove('hidden');
-                renderScheduleTable(data.weekly);
-            } else {
-                document.getElementById('scheduleEmptyState').classList.remove('hidden');
-                document.getElementById('scheduleTableContainer').classList.add('hidden');
-            }
-            
+            // Render daily operations table
             if (data.daily && data.daily.length > 0) {
                 document.getElementById('dailyEmptyState').classList.add('hidden');
                 document.getElementById('dailyTableContainer').classList.remove('hidden');
@@ -643,54 +730,8 @@
             document.getElementById('totalManpower').textContent = '0';
             document.getElementById('manpowerDate').textContent = 'Last updated: No data';
             
-            document.getElementById('scheduleEmptyState').classList.remove('hidden');
-            document.getElementById('scheduleTableContainer').classList.add('hidden');
             document.getElementById('dailyEmptyState').classList.remove('hidden');
             document.getElementById('dailyTableContainer').classList.add('hidden');
-        }
-
-        function renderScheduleTable(weeklyData) {
-            var tbody = document.getElementById('scheduleTableBody');
-            tbody.innerHTML = '';
-
-            weeklyData.forEach(function(item) {
-                item.shifts.forEach(function(shift, index) {
-                    var tr = document.createElement('tr');
-                    
-                    if (index === 0) {
-                        var activityCell = document.createElement('td');
-                        activityCell.className = 'font-semibold';
-                        activityCell.textContent = item.activity;
-                        tr.appendChild(activityCell);
-                    } else {
-                        var emptyCell = document.createElement('td');
-                        tr.appendChild(emptyCell);
-                    }
-                    
-                    var shiftCell = document.createElement('td');
-                    shiftCell.textContent = shift.type;
-                    tr.appendChild(shiftCell);
-                    
-                    shift.data.forEach(function(cellData, i) {
-                        var td = document.createElement('td');
-                        td.className = 'text-center';
-                        
-                        if (cellData === 'OFF' || cellData === 'No data') {
-                            td.className += ' text-red';
-                            td.textContent = 'OFF';
-                        } else if (i === shift.data.length - 1) {
-                            td.className += ' font-semibold';
-                            td.textContent = cellData;
-                        } else {
-                            td.textContent = cellData;
-                        }
-                        
-                        tr.appendChild(td);
-                    });
-                    
-                    tbody.appendChild(tr);
-                });
-            });
         }
 
         function renderDailyOperations(data) {
@@ -768,4 +809,3 @@
     </script>
 </body>
 </html>
-                        
