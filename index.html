@@ -344,6 +344,23 @@
             background: #e0f2fe;
         }
         
+        /* Off Day Styling */
+        .off-day {
+            background: repeating-linear-gradient(
+                45deg,
+                #fef3c7,
+                #fef3c7 10px,
+                #fde68a 10px,
+                #fde68a 20px
+            ) !important;
+        }
+        
+        .off-day td {
+            background: transparent !important;
+            color: #d97706;
+            font-weight: 600;
+        }
+        
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -612,6 +629,131 @@
 
         let currentProduction = 'healthcare';
 
+        // Function to check if a date is Friday or Saturday and after 21/11/2025
+        function isOffDay(dateString) {
+            try {
+                // Check if dateString is defined and is a string
+                if (!dateString || typeof dateString !== 'string') {
+                    return false;
+                }
+                
+                // Parse the date string (assuming format DD/MM/YYYY)
+                const parts = dateString.split('/');
+                if (parts.length !== 3) return false;
+                
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1; // Months are 0-indexed
+                const year = parseInt(parts[2]);
+                
+                // Validate date components
+                if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
+                if (day < 1 || day > 31) return false;
+                if (month < 0 || month > 11) return false;
+                if (year < 2000 || year > 2100) return false;
+                
+                const date = new Date(year, month, day);
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) return false;
+                
+                // Check if date is after 21/11/2025
+                const cutoffDate = new Date(2025, 10, 21); // November 21, 2025 (month is 0-indexed)
+                if (date < cutoffDate) return false;
+                
+                // Check if it's Friday (5) or Saturday (6)
+                const dayOfWeek = date.getDay();
+                return dayOfWeek === 5 || dayOfWeek === 6; // 5 = Friday, 6 = Saturday
+                
+            } catch (error) {
+                console.error('Error checking off day for date:', dateString, error);
+                return false;
+            }
+        }
+
+        // Function to create off day record
+        function createOffDayRecord(dateString, dayName) {
+            try {
+                const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                const parts = dateString.split('/');
+                if (parts.length !== 3) {
+                    console.error('Invalid date format for off day:', dateString);
+                    return null;
+                }
+                
+                const month = monthNames[parseInt(parts[1]) - 1] + ' ' + parts[2];
+                
+                return {
+                    month: month,
+                    date: dateString,
+                    day: dayName,
+                    premixing: {
+                        product: 'OFF',
+                        planned: 0,
+                        actualProduct: 'OFF',
+                        batch: '-',
+                        actual: 0
+                    },
+                    process: {
+                        product: 'OFF',
+                        planned: 0,
+                        actualProduct: 'OFF',
+                        batch: '-',
+                        actual: 0
+                    },
+                    sorting: {
+                        product: 'OFF',
+                        planned: 0,
+                        actualProduct: 'OFF',
+                        batch: '-',
+                        actual: 0
+                    },
+                    packing: {
+                        product: 'OFF',
+                        planned: 0,
+                        actualProduct: 'OFF',
+                        batch: '-',
+                        actual: 0
+                    },
+                    manpower: 0,
+                    dailyTotal: 0,
+                    hasActualData: false,
+                    hasPlannedData: false,
+                    isOffDay: true
+                };
+            } catch (error) {
+                console.error('Error creating off day record:', error);
+                return null;
+            }
+        }
+
+        // Function to get day name from date string
+        function getDayName(dateString) {
+            try {
+                if (!dateString || typeof dateString !== 'string') {
+                    return 'Unknown';
+                }
+                
+                const parts = dateString.split('/');
+                if (parts.length !== 3) return 'Unknown';
+                
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1;
+                const year = parseInt(parts[2]);
+                
+                // Validate date components
+                if (isNaN(day) || isNaN(month) || isNaN(year)) return 'Unknown';
+                
+                const date = new Date(year, month, day);
+                if (isNaN(date.getTime())) return 'Unknown';
+                
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return days[date.getDay()];
+            } catch (error) {
+                console.error('Error getting day name for date:', dateString, error);
+                return 'Unknown';
+            }
+        }
+
         function selectProduction(type) {
             currentProduction = type;
             
@@ -692,85 +834,126 @@
             var tbody = document.getElementById('dailyTableBody');
             tbody.innerHTML = '';
 
+            // Validate input data
+            if (!data || !Array.isArray(data)) {
+                console.error('Invalid data provided to renderDailyOperations');
+                return;
+            }
+
             // Use a map to track unique dates and prevent duplicates
             const dateMap = new Map();
             
             // First pass: consolidate data by date
             data.forEach(function(record) {
-                const dateKey = record.date;
-                console.log('Processing record - Date:', dateKey, 'Manpower:', record.manpower, 'Has Actual:', record.hasActualData); // Debug log
-                
-                if (!dateMap.has(dateKey)) {
-                    dateMap.set(dateKey, {
-                        month: record.month,
-                        date: record.date,
-                        day: record.day,
-                        premixing: { ...record.premixing },
-                        process: { ...record.process },
-                        sorting: { ...record.sorting },
-                        packing: { ...record.packing },
-                        manpower: record.manpower || 0,
-                        dailyTotal: record.dailyTotal || 0,
-                        hasActualData: record.hasActualData || false,
-                        hasPlannedData: record.hasPlannedData || false
-                    });
-                } else {
-                    // Merge data for the same date
-                    const existing = dateMap.get(dateKey);
+                try {
+                    if (!record || !record.date) {
+                        console.warn('Skipping invalid record:', record);
+                        return;
+                    }
                     
-                    // Update with actual data if available
-                    if (record.hasActualData) {
-                        existing.premixing.actualProduct = record.premixing.actualProduct || existing.premixing.actualProduct;
-                        existing.premixing.batch = record.premixing.batch || existing.premixing.batch;
-                        existing.premixing.actual = record.premixing.actual || existing.premixing.actual;
+                    const dateKey = record.date;
+                    
+                    if (!dateMap.has(dateKey)) {
+                        dateMap.set(dateKey, {
+                            month: record.month || 'Unknown',
+                            date: record.date,
+                            day: record.day || 'Unknown',
+                            premixing: { ...(record.premixing || {}) },
+                            process: { ...(record.process || {}) },
+                            sorting: { ...(record.sorting || {}) },
+                            packing: { ...(record.packing || {}) },
+                            manpower: record.manpower || 0,
+                            dailyTotal: record.dailyTotal || 0,
+                            hasActualData: record.hasActualData || false,
+                            hasPlannedData: record.hasPlannedData || false,
+                            isOffDay: record.isOffDay || false
+                        });
+                    } else {
+                        // Merge data for the same date
+                        const existing = dateMap.get(dateKey);
                         
-                        existing.process.actualProduct = record.process.actualProduct || existing.process.actualProduct;
-                        existing.process.batch = record.process.batch || existing.process.batch;
-                        existing.process.actual = record.process.actual || existing.process.actual;
-                        
-                        existing.sorting.actualProduct = record.sorting.actualProduct || existing.sorting.actualProduct;
-                        existing.sorting.batch = record.sorting.batch || existing.sorting.batch;
-                        existing.sorting.actual = record.sorting.actual || existing.sorting.actual;
-                        
-                        existing.packing.actualProduct = record.packing.actualProduct || existing.packing.actualProduct;
-                        existing.packing.batch = record.packing.batch || existing.packing.batch;
-                        existing.packing.actual = record.packing.actual || existing.packing.actual;
-                        
-                        // CRITICAL FIX: Always update manpower from actual data
-                        if (record.manpower !== undefined && record.manpower !== null) {
-                            existing.manpower = record.manpower;
-                            console.log('Updated manpower for', dateKey, 'to:', record.manpower); // Debug log
+                        // Update with actual data if available
+                        if (record.hasActualData) {
+                            existing.premixing.actualProduct = record.premixing?.actualProduct || existing.premixing.actualProduct;
+                            existing.premixing.batch = record.premixing?.batch || existing.premixing.batch;
+                            existing.premixing.actual = record.premixing?.actual || existing.premixing.actual;
+                            
+                            existing.process.actualProduct = record.process?.actualProduct || existing.process.actualProduct;
+                            existing.process.batch = record.process?.batch || existing.process.batch;
+                            existing.process.actual = record.process?.actual || existing.process.actual;
+                            
+                            existing.sorting.actualProduct = record.sorting?.actualProduct || existing.sorting.actualProduct;
+                            existing.sorting.batch = record.sorting?.batch || existing.sorting.batch;
+                            existing.sorting.actual = record.sorting?.actual || existing.sorting.actual;
+                            
+                            existing.packing.actualProduct = record.packing?.actualProduct || existing.packing.actualProduct;
+                            existing.packing.batch = record.packing?.batch || existing.packing.batch;
+                            existing.packing.actual = record.packing?.actual || existing.packing.actual;
+                            
+                            // CRITICAL FIX: Always update manpower from actual data
+                            if (record.manpower !== undefined && record.manpower !== null) {
+                                existing.manpower = record.manpower;
+                            }
+                            
+                            existing.dailyTotal = record.dailyTotal || existing.dailyTotal;
+                            existing.hasActualData = true;
                         }
                         
-                        existing.dailyTotal = record.dailyTotal || existing.dailyTotal;
-                        existing.hasActualData = true;
+                        // Update with planned data if available
+                        if (record.hasPlannedData) {
+                            existing.premixing.product = record.premixing?.product || existing.premixing.product;
+                            existing.premixing.planned = record.premixing?.planned || existing.premixing.planned;
+                            
+                            existing.process.product = record.process?.product || existing.process.product;
+                            existing.process.planned = record.process?.planned || existing.process.planned;
+                            
+                            existing.sorting.product = record.sorting?.product || existing.sorting.product;
+                            existing.sorting.planned = record.sorting?.planned || existing.sorting.planned;
+                            
+                            existing.packing.product = record.packing?.product || existing.packing.product;
+                            existing.packing.planned = record.packing?.planned || existing.packing.planned;
+                            
+                            existing.hasPlannedData = true;
+                        }
                     }
-                    
-                    // Update with planned data if available
-                    if (record.hasPlannedData) {
-                        existing.premixing.product = record.premixing.product || existing.premixing.product;
-                        existing.premixing.planned = record.premixing.planned || existing.premixing.planned;
-                        
-                        existing.process.product = record.process.product || existing.process.product;
-                        existing.process.planned = record.process.planned || existing.process.planned;
-                        
-                        existing.sorting.product = record.sorting.product || existing.sorting.product;
-                        existing.sorting.planned = record.sorting.planned || existing.sorting.planned;
-                        
-                        existing.packing.product = record.packing.product || existing.packing.product;
-                        existing.packing.planned = record.packing.planned || existing.packing.planned;
-                        
-                        existing.hasPlannedData = true;
-                    }
+                } catch (error) {
+                    console.error('Error processing record:', record, error);
                 }
             });
 
             // Convert map to array and sort by date
-            const consolidatedData = Array.from(dateMap.values()).sort((a, b) => {
-                return new Date(a.date.split('/').reverse().join('-')) - new Date(b.date.split('/').reverse().join('-'));
+            let consolidatedData = Array.from(dateMap.values()).sort((a, b) => {
+                try {
+                    return new Date(a.date.split('/').reverse().join('-')) - new Date(b.date.split('/').reverse().join('-'));
+                } catch (error) {
+                    console.error('Error sorting dates:', a.date, b.date, error);
+                    return 0;
+                }
             });
 
-            console.log('Consolidated data:', consolidatedData); // Debug log
+            // Add off days for Fridays and Saturdays starting from 21/11/2025
+            const offDaysData = [];
+            consolidatedData.forEach(record => {
+                try {
+                    // Check if this date should be an off day
+                    if (isOffDay(record.date) && !record.hasActualData && !record.hasPlannedData) {
+                        const dayName = getDayName(record.date);
+                        const offDayRecord = createOffDayRecord(record.date, dayName);
+                        if (offDayRecord) {
+                            offDaysData.push(offDayRecord);
+                        } else {
+                            offDaysData.push(record); // Keep original record if off day creation fails
+                        }
+                    } else {
+                        offDaysData.push(record);
+                    }
+                } catch (error) {
+                    console.error('Error processing record for off day check:', record, error);
+                    offDaysData.push(record); // Keep original record on error
+                }
+            });
+
+            consolidatedData = offDaysData;
 
             // Group by month for rowspan calculation
             let lastMonth = '';
@@ -807,82 +990,94 @@
             // Render rows
             let currentMonthGroup = 0;
             consolidatedData.forEach(function(record, index) {
-                var tr = document.createElement('tr');
-                
-                // Month cell (only for first row of each month)
-                if (currentMonthGroup < monthGroups.length && 
-                    index === monthGroups[currentMonthGroup].startIndex) {
-                    var monthCell = document.createElement('td');
-                    monthCell.textContent = monthGroups[currentMonthGroup].month;
-                    monthCell.className = 'font-semibold';
-                    monthCell.rowSpan = monthGroups[currentMonthGroup].rowspan;
-                    monthCell.style.verticalAlign = 'middle';
-                    tr.appendChild(monthCell);
-                    currentMonthGroup++;
+                try {
+                    var tr = document.createElement('tr');
+                    
+                    // Add off-day styling
+                    if (record.isOffDay) {
+                        tr.className = 'off-day';
+                    }
+                    
+                    // Month cell (only for first row of each month)
+                    if (currentMonthGroup < monthGroups.length && 
+                        index === monthGroups[currentMonthGroup].startIndex) {
+                        var monthCell = document.createElement('td');
+                        monthCell.textContent = monthGroups[currentMonthGroup].month;
+                        monthCell.className = 'font-semibold';
+                        monthCell.rowSpan = monthGroups[currentMonthGroup].rowspan;
+                        monthCell.style.verticalAlign = 'middle';
+                        tr.appendChild(monthCell);
+                        currentMonthGroup++;
+                    }
+                    
+                    // Date, Day
+                    tr.appendChild(createCell(record.date || 'Unknown', 'font-semibold'));
+                    tr.appendChild(createCell(record.day || 'Unknown', 'font-semibold'));
+                    
+                    // Premixing
+                    tr.appendChild(createCell(record.premixing?.product || '-'));
+                    tr.appendChild(createCell(record.premixing?.planned || 0));
+                    tr.appendChild(createCell(record.premixing?.actualProduct || '-'));
+                    tr.appendChild(createCell(record.premixing?.batch || '-'));
+                    tr.appendChild(createCell(record.premixing?.actual || 0, 
+                        record.premixing?.actual >= record.premixing?.planned ? 'text-green' : 'text-red'));
+                    
+                    // Process/Filling
+                    tr.appendChild(createCell(record.process?.product || '-'));
+                    tr.appendChild(createCell(record.process?.planned || 0));
+                    tr.appendChild(createCell(record.process?.actualProduct || '-'));
+                    tr.appendChild(createCell(record.process?.batch || '-'));
+                    tr.appendChild(createCell(record.process?.actual || 0, 
+                        record.process?.actual >= record.process?.planned ? 'text-green' : 'text-red'));
+                    
+                    // Sorting (only for healthcare and rocksalt)
+                    if (currentProduction !== 'toothpaste') {
+                        tr.appendChild(createCell(record.sorting?.product || '-'));
+                        tr.appendChild(createCell(record.sorting?.planned || 0));
+                        tr.appendChild(createCell(record.sorting?.actualProduct || '-'));
+                        tr.appendChild(createCell(record.sorting?.batch || '-'));
+                        tr.appendChild(createCell(record.sorting?.actual || 0, 
+                            record.sorting?.actual >= record.sorting?.planned ? 'text-green' : 'text-red'));
+                    }
+                    
+                    // Packing
+                    tr.appendChild(createCell(record.packing?.product || '-'));
+                    tr.appendChild(createCell(record.packing?.planned || 0));
+                    tr.appendChild(createCell(record.packing?.actualProduct || '-'));
+                    tr.appendChild(createCell(record.packing?.batch || '-'));
+                    tr.appendChild(createCell(record.packing?.actual || 0, 
+                        record.packing?.actual >= record.packing?.planned ? 'text-green' : 'text-red'));
+                    
+                    // Manpower
+                    tr.appendChild(createCell(record.manpower || 0, 'font-semibold text-center'));
+                    
+                    // Daily Total
+                    tr.appendChild(createCell(record.dailyTotal || 0, 'font-semibold text-center'));
+                    
+                    // Status column
+                    let statusText = 'No Data';
+                    let statusClass = '';
+                    
+                    if (record.isOffDay) {
+                        statusText = 'OFF DAY';
+                        statusClass = 'text-center';
+                    } else if (record.hasActualData && record.hasPlannedData) {
+                        statusText = 'Completed';
+                        statusClass = 'text-green';
+                    } else if (record.hasPlannedData) {
+                        statusText = 'Planned';
+                        statusClass = 'text-center';
+                    } else if (record.hasActualData) {
+                        statusText = 'Actual Only';
+                        statusClass = 'text-center';
+                    }
+                    
+                    tr.appendChild(createCell(statusText, statusClass));
+                    
+                    tbody.appendChild(tr);
+                } catch (error) {
+                    console.error('Error rendering row:', record, error);
                 }
-                
-                // Date, Day
-                tr.appendChild(createCell(record.date, 'font-semibold'));
-                tr.appendChild(createCell(record.day, 'font-semibold'));
-                
-                // Premixing
-                tr.appendChild(createCell(record.premixing.product || '-'));
-                tr.appendChild(createCell(record.premixing.planned || 0));
-                tr.appendChild(createCell(record.premixing.actualProduct || '-'));
-                tr.appendChild(createCell(record.premixing.batch || '-'));
-                tr.appendChild(createCell(record.premixing.actual || 0, 
-                    record.premixing.actual >= record.premixing.planned ? 'text-green' : 'text-red'));
-                
-                // Process/Filling
-                tr.appendChild(createCell(record.process.product || '-'));
-                tr.appendChild(createCell(record.process.planned || 0));
-                tr.appendChild(createCell(record.process.actualProduct || '-'));
-                tr.appendChild(createCell(record.process.batch || '-'));
-                tr.appendChild(createCell(record.process.actual || 0, 
-                    record.process.actual >= record.process.planned ? 'text-green' : 'text-red'));
-                
-                // Sorting (only for healthcare and rocksalt)
-                if (currentProduction !== 'toothpaste') {
-                    tr.appendChild(createCell(record.sorting.product || '-'));
-                    tr.appendChild(createCell(record.sorting.planned || 0));
-                    tr.appendChild(createCell(record.sorting.actualProduct || '-'));
-                    tr.appendChild(createCell(record.sorting.batch || '-'));
-                    tr.appendChild(createCell(record.sorting.actual || 0, 
-                        record.sorting.actual >= record.sorting.planned ? 'text-green' : 'text-red'));
-                }
-                
-                // Packing
-                tr.appendChild(createCell(record.packing.product || '-'));
-                tr.appendChild(createCell(record.packing.planned || 0));
-                tr.appendChild(createCell(record.packing.actualProduct || '-'));
-                tr.appendChild(createCell(record.packing.batch || '-'));
-                tr.appendChild(createCell(record.packing.actual || 0, 
-                    record.packing.actual >= record.packing.planned ? 'text-green' : 'text-red'));
-                
-                // Manpower - FIXED: Always display the manpower value
-                tr.appendChild(createCell(record.manpower || 0, 'font-semibold text-center'));
-                
-                // Daily Total
-                tr.appendChild(createCell(record.dailyTotal || 0, 'font-semibold text-center'));
-                
-                // Status column
-                let statusText = 'No Data';
-                let statusClass = '';
-                
-                if (record.hasActualData && record.hasPlannedData) {
-                    statusText = 'Completed';
-                    statusClass = 'text-green';
-                } else if (record.hasPlannedData) {
-                    statusText = 'Planned';
-                    statusClass = 'text-center';
-                } else if (record.hasActualData) {
-                    statusText = 'Actual Only';
-                    statusClass = 'text-center';
-                }
-                
-                tr.appendChild(createCell(statusText, statusClass));
-                
-                tbody.appendChild(tr);
             });
         }
 
